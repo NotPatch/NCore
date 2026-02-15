@@ -1,0 +1,4 @@
+name: NCore
+version: '1.0-SNAPSHOT'
+main: com.notpatch.nCore.NCore
+api-version: '1.21'

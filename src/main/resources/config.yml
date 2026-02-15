@@ -1,0 +1,11 @@
+debug-mode: false
+
+database:
+  host: localhost
+  port: 3306
+  database: ncore
+  username: root
+  password: ''
+  pool-size: 10
+  use-ssl: false
+
