@@ -44,7 +44,7 @@ import java.sql.SQLException;
     name = "DatabaseModule",
     description = "Database kullanan örnek modül",
     authors = {"YourName"},
-    requiresDatabase = true  // Database gerekli!
+    requiresDatabase = true
 )
 public class DatabaseModule extends Module {
 
@@ -85,8 +85,4 @@ public class DatabaseModule extends Module {
     }
 }
 ```
-
-## İletişim
-
-- GitHub: [NotPatch](https://github.com/notpatch)
 
