@@ -6,7 +6,15 @@ import com.notpatch.nCore.module.ModuleManager;
 import io.papermc.paper.command.brigadier.BasicCommand;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.Nullable;
+
+import java.io.File;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ModuleCommand implements BasicCommand {
 
@@ -178,5 +186,60 @@ public class ModuleCommand implements BasicCommand {
         sender.sendMessage(success + "§7All modules have been reloaded.");
     }
 
+    @Override
+    public Collection<String> suggest(CommandSourceStack commandSourceStack, String[] args) {
+        List<String> suggestions = List.of("list", "info", "load", "enable", "disable", "reload");
+
+        if (args.length == 0) {
+            return suggestions;
+        }
+
+        if (args.length == 1) {
+            String input = args[0].toLowerCase();
+            return suggestions.stream()
+                    .filter(suggestion -> suggestion.toLowerCase().startsWith(input))
+                    .collect(Collectors.toList());
+        }
+
+        if (args.length == 2) {
+            String subCommand = args[0].toLowerCase();
+            String input = args[1].toLowerCase();
+
+            return switch (subCommand) {
+                case "info", "enable", "disable", "reload" -> moduleManager.getModules().stream()
+                        .map(Module::getName)
+                        .filter(name -> name.toLowerCase().startsWith(input))
+                        .collect(Collectors.toList());
+
+                case "load" -> {
+                    File modulesFolder = new File(plugin.getDataFolder().getParentFile(), "modules");
+                    if (modulesFolder.exists() && modulesFolder.isDirectory()) {
+                        File[] files = modulesFolder.listFiles((dir, name) -> name.endsWith(".jar"));
+                        if (files != null) {
+                            yield java.util.Arrays.stream(files)
+                                    .map(File::getName)
+                                    .filter(name -> name.toLowerCase().startsWith(input))
+                                    .collect(Collectors.toList());
+                        }
+                    }
+                    yield Collections.emptyList();
+                }
+
+                default -> Collections.emptyList();
+            };
+        }
+
+        return Collections.emptyList();
+    }
+
+    @Override
+    public boolean canUse(CommandSender sender) {
+        return sender.isOp() || sender.hasPermission("ncore.module") || sender instanceof ConsoleCommandSender;
+    }
+
+    @Override
+    public @Nullable String permission() {
+        return "ncore.module";
+    }
 }
 
